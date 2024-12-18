@@ -1,0 +1,69 @@
+# Default values for snaplogic-snaplex.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Regular nodes count
+jccCount: 1
+
+# Feedmaster nodes count
+feedmasterCount: 0
+
+# Docker image of SnapLogic snaplex
+image:
+  repository: snaplogic/snaplex
+  tag: latest
+
+# SnapLogic configuration link
+snaplogic_config_link: https://elastic.snaplogic.com/api/1/rest/plex/config/SnapLogic-PS-Team/Ingo_Sauerzapf/shared/ingo_k8s_groundplex
+
+# SnapLogic Org admin credential
+snaplogic_secret: snaplogic-admin-credentials
+
+# Enhanced encryption secret
+#enhanced_encrypt_secret:
+
+# CPU and memory limits/requests for the nodes
+limits:
+  memory: 8Gi
+  cpu: 2000m
+requests:
+  memory: 8Gi
+  cpu: 2000m
+
+# Default file ulimit and process ulimit
+sl_file_ulimit: 8192
+sl_process_ulimit: 4096
+
+# Enable/disable startup, liveness and readiness probes
+probes:
+  enabled: true
+
+# JCC HPA
+autoscaling:
+  enabled: false
+
+  minReplicas:
+  maxReplicas:
+
+  # Average count of Snaplex queued pipelines (e.g. targetPlexQueueSize: 5), leave empty to disable
+  # To enable this metric, Prometheus and Prometheus-Adapter are required to install.
+  targetPlexQueueSize:
+
+  # Average CPU utilization (e.g. targetAvgCPUUtilization: 50 means 50%), leave empty to disable.
+  # To enable this metric, Kubernetes Metrics Server is required to install.
+  targetAvgCPUUtilization:
+
+  # Average memory utilization (e.g. targetAvgMemoryUtilization: 50 means 50%), leave empty to disable.
+  # To enable this metric, Kubernetes Metrics Server is required to install.
+  targetAvgMemoryUtilization:
+
+  # window to consider waiting while scaling up. default is 0s if empty.
+  scaleUpStabilizationWindowSeconds:
+  # window to consider waiting while scaling down. default is 300s if empty.
+  scaleDownStabilizationWindowSeconds:
+
+# grace period seconds after JCC termination signal before force shutdown, default is 30s if empty.
+terminationGracePeriodSeconds: 900
+
+# Enable IPv6 service for DNS routing to pods
+enableIPv6: false

@@ -1,0 +1,107 @@
+{{- if gt (int .Values.feedmasterCount) 0 -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "snaplogic-snaplex.fullname" . }}-feedmaster"
+  labels:
+{{ include "snaplogic-snaplex.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.feedmasterCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "snaplogic-snaplex.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "snaplogic-snaplex.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/type: fm
+    spec:
+      enableServiceLinks: false
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+          {{- if .Values.probes.enabled }}
+          readinessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /healthz
+              port: 8084
+            failureThreshold: 3
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8084
+            failureThreshold: 6
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: 8084
+            failureThreshold: 30
+            periodSeconds: 10
+          {{- end }}
+          resources:
+            requests:
+              memory: "{{ .Values.requests.memory }}"
+              cpu: "{{ .Values.requests.cpu }}"
+            limits:
+              memory: "{{ .Values.limits.memory }}"
+              cpu: "{{ .Values.limits.cpu }}"
+          env:
+            - name: SNAPLOGIC_CONFIG_LINK
+              value: "{{ .Values.snaplogic_config_link }}"
+            - name: BOOTSTRAP_NAME
+              value: "feed_master"
+        {{- if .Values.sl_file_ulimit }}
+            - name: SL_FILE_ULIMIT
+              value: "{{ .Values.sl_file_ulimit }}"
+        {{- end }}
+        {{- if .Values.sl_process_ulimit }}
+            - name: SL_PROCESS_ULIMIT
+              value: "{{ .Values.sl_process_ulimit }}"
+        {{- end }}
+        {{- if .Values.snaplogic_secret }}
+            - name: SNAPLOGIC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.snaplogic_secret }}
+                  key: username
+            - name: SNAPLOGIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.snaplogic_secret }}
+                  key: password
+        {{- end }}
+        {{- if .Values.feedmaster }}
+            - name: BOOTSTRAP_NAME
+              value: "feed_master"
+        {{- end }}
+      {{- if .Values.enhanced_encrypt_secret }}
+          volumeMounts:
+          - name: keystore-jks
+            mountPath: "/etc/snaplogic/jcc-datakeys.jks"
+            subPath: jcc-datakeys.jks
+            readOnly: true
+          - name: keystore-pass
+            mountPath: "/etc/snaplogic/jcc-datakeys.pass"
+            subPath: jcc-datakeys.pass
+            readOnly: true
+      volumes:
+        - name: keystore-jks
+          secret:
+            secretName: {{ .Values.enhanced_encrypt_secret }}
+            items:
+            - key: keystore_jks
+              path: jcc-datakeys.jks
+        - name: keystore-pass
+          secret:
+            secretName: {{ .Values.enhanced_encrypt_secret }}
+            items:
+            - key: keystore_pass
+              path: jcc-datakeys.pass
+      {{- end }}
+{{- end -}}

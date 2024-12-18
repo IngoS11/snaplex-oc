@@ -1,0 +1,18 @@
+{{- if gt (int .Values.jccCount) 0 -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ include "snaplogic-snaplex.fullname" . }}-regular"
+  labels:
+{{ include "snaplogic-snaplex.labels" . | indent 4 }}
+spec:
+#  type: LoadBalancer
+  ports:
+    - port: 8081
+      protocol: TCP
+      name: jcc
+  selector:
+    app.kubernetes.io/name: {{ include "snaplogic-snaplex.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/type: jcc
+{{- end -}}

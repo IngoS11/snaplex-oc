@@ -1,0 +1,18 @@
+{{- if gt (int .Values.feedmasterCount) 0 -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ include "snaplogic-snaplex.fullname" . }}-feed"
+  labels:
+{{ include "snaplogic-snaplex.labels" . | indent 4 }}
+spec:
+#  type: LoadBalancer
+  ports:
+    - port: 8084
+      protocol: TCP
+      name: feedmaster
+  selector:
+    app.kubernetes.io/name: {{ include "snaplogic-snaplex.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/type: fm
+{{- end -}}

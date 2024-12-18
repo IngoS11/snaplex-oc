@@ -1,0 +1,49 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "{{ include "snaplogic-snaplex.fullname" . }}-hpa"
+  labels:
+{{ include "snaplogic-snaplex.labels" . | indent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: "{{ include "snaplogic-snaplex.fullname" . }}-jcc"
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.autoscaling.targetPlexQueueSize }}
+    - type: Pods
+      pods:
+        metric:
+          name: plex_queue_size
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.autoscaling.targetPlexQueueSize }}
+    {{- end }}
+    {{- if .Values.autoscaling.targetAvgCPUUtilization }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetAvgCPUUtilization }}
+    {{- end }}
+    {{- if .Values.autoscaling.targetAvgMemoryUtilization }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetAvgMemoryUtilization }}
+    {{- end }}
+
+  behavior:
+    # window to consider waiting while scaling Up. default is 0s if empty.
+    scaleUp:
+      stabilizationWindowSeconds: {{ .Values.autoscaling.scaleUpStabilizationWindowSeconds }}
+    # window to consider waiting while scaling down. default is 300s if empty.
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.autoscaling.scaleDownStabilizationWindowSeconds }}
+  {{- end }}

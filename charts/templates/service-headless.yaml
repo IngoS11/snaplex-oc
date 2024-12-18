@@ -1,0 +1,12 @@
+{{- if .Values.enableIPv6 -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ include "snaplogic-snaplex.fullname" . }}-ipv6"
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: {{ include "snaplogic-snaplex.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  type: ClusterIP
+{{- end -}}
