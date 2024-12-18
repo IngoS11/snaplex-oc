@@ -14,7 +14,7 @@ image:
   tag: latest
 
 # SnapLogic configuration link
-snaplogic_config_link: https://elastic.snaplogic.com/api/1/rest/plex/config/SnapLogic-PS-Team/Ingo_Sauerzapf/shared/ingo_k8s_groundplex
+snaplogic_config_link: <Link to Snaplex configuration>
 
 # SnapLogic Org admin credential
 snaplogic_secret: snaplogic-admin-credentials

@@ -6,7 +6,6 @@ metadata:
   labels:
 {{ include "snaplogic-snaplex.labels" . | indent 4 }}
 spec:
-#  type: LoadBalancer
   ports:
     - port: 8081
       protocol: TCP
