@@ -8,21 +8,23 @@ ADD run.sh /.docker
 RUN chmod a+x /.docker/run.sh
 
 # change group ownership of /opt/snaplogic/ to root
-RUN chgrp -R root /opt/snaplogic/
+# RUN chgrp -R root /opt/snaplogic/
 
 # Switch to root user to change the mode of the /opt/snaplogic/etc
 # directory to g+w, execute GroundPlex node to generate keys with
 # the root user.
-RUN usermod -a -G root snapuser \
-    && chmod g+w /opt/snaplogic/etc/ \
-    && /opt/snaplogic/bin/jcc.sh genkey \
-    && chmod -R g+w /opt/snaplogic/
-    
+#RUN usermod -a -G root snapuser \
+#    && chmod g+w /opt/snaplogic/etc/ \
+#    && /opt/snaplogic/bin/jcc.sh genkey \
+#    && chmod -R g+w /opt/snaplogic/
+
+RUN /opt/snaplogic/bin/jcc.sh genkey
+
 # Add the root group to be allowed to read the configuration
 # in /etc/snaplogic
-RUN chmod g+rwx /etc/snaplogic/ \
-    && chmod g+rw /etc/snaplogic/* 
+#RUN chmod g+rwx /etc/snaplogic/ \
+#    && chmod g+rw /etc/snaplogic/* 
 
 # change the default user of the container to be the snaplogic user
-USER snapuser
+# USER snapuser
     
