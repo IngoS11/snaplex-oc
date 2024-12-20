@@ -18,7 +18,8 @@ RUN chown -R 1000650000:root /opt/snaplogic/
 #    && /opt/snaplogic/bin/jcc.sh genkey \
 #    && chmod -R g+w /opt/snaplogic/
 
-RUN /opt/snaplogic/bin/jcc.sh genkey
+RUN chmod g+w /opt/snaplogic/etc/ \
+    /opt/snaplogic/bin/jcc.sh genkey
 
 # Add the root group to be allowed to read the configuration
 # in /etc/snaplogic
